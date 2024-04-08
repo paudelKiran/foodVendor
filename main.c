@@ -49,7 +49,7 @@ void food_order(int food);
 void hotel_initialize();
 void hotels(int hotel_choice);
 
-// Gobal initialization of values
+
 int flag = 1, i, j = 0, At = -1, Dot = -1, caps = 0;
 int small = 0, special = 0, numbers = 0;
 int success = 0, validate, choice;
