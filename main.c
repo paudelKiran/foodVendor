@@ -1,5 +1,5 @@
 /*
-Name of Project: Food Ordering System using C
+Name of Project: Food Vendor System using C
 Functionalities: 1. Sign-up & Login
                  2. Validate user (to check password & other details of user, or if user already exists)
                  3. Search by hotel name
@@ -12,15 +12,16 @@ Concepts used: Modular approach in programming
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+// #include <conio.h>
 
 // User details for sign-up
-struct userDetails
+struct userDetail
 {
-    int age;
-    char userName[100];
+    // int age;
+    char name[100];
     char email[100];
-    char mobile[20];
-    char password[20];
+    char mobile[10];
+    char password[8];
 };
 
 // Hotel details & their food details
@@ -35,12 +36,12 @@ struct hotelDetails
 
 // Initialize the hotels & user details
 struct hotelDetails hotel[6];
-struct userDetails user[100];
+struct userDetail user[100];
 
 // Decalarations of functions
 void signup();
-void account_check();
-int is_valid();
+void account_check(char *);
+int is_valid(char *, char *);
 void login();
 void cart();
 void search_by_hotels();
@@ -53,20 +54,19 @@ void hotels(int hotel_choice);
 int flag = 1, i, j = 0, At = -1, Dot = -1, caps = 0;
 int small = 0, special = 0, numbers = 0;
 int success = 0, validate, choice;
-char temp_name[100], temp_password1[20];
-char temp_password2[20], temp_email[100];
+char temp_name[100], temp_email[100];
 char temp_mobile[20];
-int temp_age, total = 0, food_choice, n;
+int total = 0, food_choice, n;
 int hotel_choice, search_choice, confirm;
 int ch, food, hotel_id;
 
 // Food Ordering system
 int main()
 {
-
+    // system("cls");
+    printf("\n\n\t\tWelcome to our Food Ordering System\n");
     while (1)
     {
-        printf("\n\n\t\tWelcome to our Food Ordering System\n");
         printf("\n1. Sign-up\n2. Login\n3. Exit\n");
         printf("Please enter your choice\n");
 
@@ -85,7 +85,7 @@ int main()
             break;
         // for exiting
         case 3:
-            exit(1);
+            exit(4);
         default:
             printf("\n Please enter a valid choice\n");
             break;
@@ -98,18 +98,15 @@ int main()
 // function signup
 void signup()
 {
+    char temp_password1[20], temp_password2[20];
     printf("\n\n***********SINGUP************\n\n");
 
-    // flushes the standard input
-    // (clears the input buffer)
+    // clears the input buffer
     while ((getchar()) != '\n')
         ;
 
     printf("Enter Your name: ");
-    scanf("%[^\n]%*c", temp_name);
-
-    printf("Enter Your Age: ");
-    scanf("%d", &temp_age);
+    scanf("%s", temp_name);
 
     printf("Enter Your Email: ");
     scanf("%s", temp_email);
@@ -124,43 +121,63 @@ void signup()
     scanf("%s", temp_mobile);
 
     // now call validate function
-    validate = is_valid();
+    validate = is_valid(temp_password1, temp_password2);
     if (validate == 1)
     {
         // to check if the user account already exists
-        account_check();
+        account_check(temp_password1);
     }
 }
 
 // Function to check if the account already exists or not
-void account_check()
+void account_check(char *temp_pass)
 {
-    for (i = 0; i < 100; i++)
+
+    FILE *fptr;
+    fptr = fopen("userDetails.txt", "a+");
+    if (fptr == NULL)
     {
-        // Check whether the email and password are already matched ~with existed account
-        if (!(strcmp(temp_email, user[i].email) && strcmp(temp_password1, user[i].password)))
+        printf("Sorry! Unable to open the file.");
+        fclose(fptr);
+        main();
+    }
+    struct userDetail customer, data;
+    int confirm = 0;
+
+    while (fread(&data, sizeof(struct userDetail), 1, fptr))
+    {
+        if (strcmp(temp_email, data.email) == 0 || strcmp(temp_mobile, data.mobile) == 0)
         {
-            printf("\n\nAccount Already Existed. Please Login !!");
+            printf("\n\nAccount Already Existed. Please try with new credentials. !!");
+            fclose(fptr);
             main();
             break;
         }
     }
-    // if account does not already existed, it creates a new one with new inputs
-    if (i == 100)
-    {
-        strcpy(user[j].userName, temp_name);
-        strcpy(user[j].password, temp_password1);
-        strcpy(user[j].email, temp_email);
-        strcpy(user[j].mobile, temp_mobile);
-        user[j].age = temp_age;
-        j++;
 
-        printf("\n\n\nAccount Successfully Created!!\n\n");
+    // creating new account if it doesn't exist already
+    strcpy(customer.name, temp_name);
+    strcpy(customer.password, temp_pass);
+    strcpy(customer.email, temp_email);
+    strcpy(customer.mobile, temp_mobile);
+    confirm = fwrite(&customer, sizeof(struct userDetail), 1,
+                     fptr);
+    fclose(fptr);
+
+    if (confirm == 0)
+    {
+        printf("Sorry! Unable to write to the file.");
+        main();
+    }
+    else
+    {
+        printf("\n\nAccount Successfully Created!!\n\n");
+        main();
     }
 }
 
-// function to validate the user account for signing-up
-int is_valid()
+// function to validate the user credentials for signing-up
+int is_valid(char *temp_password1, char *temp_password2)
 {
     // Validating the name
     for (i = 0; temp_name[i] != '\0'; i++)
@@ -180,13 +197,14 @@ int is_valid()
 
         // validating email Id
 
-        // check if first char == alphabet only
+        // checking if first char is alphabet only
         if (!((temp_email[0] >= 'a' && temp_email[0] <= 'z') || (temp_email[0] >= 'A' && temp_email[0] <= 'Z')))
         {
             printf("\nPlease enter a valid email address.");
             return 0;
         }
 
+        // checking for the position of '@' and '.'
         for (i = 0; temp_email[i] != '\0'; i++)
         {
             // If character is '@'
@@ -225,48 +243,15 @@ int is_valid()
     // Validating password to check if passwords matches
     if (!strcmp(temp_password1, temp_password2))
     {
-        if (strlen(temp_password1) >= 8 && strlen(temp_password1) <= 12)
+        if (!(strlen(temp_password1) == 8))
         {
-            caps = 0;
-            small = 0;
-            numbers = 0;
-            special = 0;
-
-            // check the minimum no of occurence of small, caps, special, and numbers characters
-            for (i = 0; temp_password1[i] != '\0'; i++)
-            {
-                if (temp_password1[i] >= 'A' && temp_password1[i] <= 'Z')
-                    caps++;
-                else if (temp_password1[i] >= 'a' && temp_password1[i] <= 'z')
-                    small++;
-                else if (temp_password1[i] >= '0' && temp_password1[i] <= '9')
-                    numbers++;
-                else if (temp_password1[i] == '@' || temp_password1[i] == '&' || temp_password1[i] == '#' || temp_password1[i] == '*')
-                    special++;
-            }
-
-            if (caps == 0 || small == 0 || numbers == 0 || special == 0)
-            {
-                printf("\nPlease enter a strong password, your password must contain atleast one uppercase, lowercase, number & special character\n");
-                return 0;
-            }
-        }
-        else
-        {
-            printf("\nYour password does'nt meet the criteria.\n Length of the password must be between 8 to 12\n");
+            printf("\nYour password doesn't meet the criteria.\n Length of the password must be 8.\n");
             return 0;
         }
     }
     else
     {
-        printf("\nPasswords does not match\n");
-        return 0;
-    }
-
-    // Validating the user age
-    if (temp_age <= 0)
-    {
-        printf("\nPlease enter a valid age\n");
+        printf("\nPasswords does not match.\n");
         return 0;
     }
 
@@ -282,8 +267,7 @@ int is_valid()
         {
             if (temp_mobile[i] >= '0' && temp_mobile[i] <= '9')
             {
-                // On success every input is correct, user details can be validated
-                success = 1;
+                return 1;
             }
             else
             {
@@ -297,39 +281,45 @@ int is_valid()
         printf("\nPlease enter a valid mobile number.\n");
         return 0;
     }
-
-    // to check if every input is correct
-    if (success == 1)
-    {
-        return 1;
-    }
 }
 
 // login function
 void login()
 {
     char login_email[100];
-    char login_password[20];
+    char login_pass[8] = "hari1234";
+    char new_login_pass[8];
+
     printf("\n\n****************LOGIN*****************\n\n");
+
     printf("\nEnter Your Email: ");
     scanf("%s", login_email);
 
-    // flushes the standard input
-    // (clears the input buffer)
-    while ((getchar()) != '\n')
-        ;
-
     printf("Enter Your Password: ");
-    scanf("%s", login_password);
+    scanf("%s", login_pass);
 
-    for (i = 0; i < j; i++)
+    printf("%s\t%s", login_pass, login_email);
+    FILE *fptr;
+    fptr = fopen("userDetails.txt", "r");
+    struct userDetail data;
+    if (fptr == NULL)
     {
-        // now check if the input email already existed or not
-        if (!strcmp(user[i].email, login_email))
+        printf("Sorry! Unable to open the file.");
+        return;
+    }
+    else
+    {
+        // rewind(fptr);
+        while (fread(&data, sizeof(data), 1, fptr) != EOF)
         {
-            // now check for the password is matched with email or not for that particular user
-            if (!strcmp(user[i].password, login_password))
+            printf("\nentered ");
+            // puts(data.password);
+            printf("\n%s\t%s", data.email, data.password);
+            if (strcmp(login_email, data.email) == 0 && strcmp(login_pass, data.password) == 0)
             {
+                printf("\n%s\t%s", data.email, data.password);
+                fclose(fptr);
+
                 printf("\n\nWelcome you have successfully logged in :)\n\n");
                 printf("Please select your option");
                 printf("\n1. Search by hotel\n2. Search by Food\n3. For exit\n");
@@ -355,16 +345,18 @@ void login()
             }
             else
             {
-                printf("\nInvalid password! Please enter the correct passsword\n");
-                main();
-                break;
+                fclose(fptr);
+                printf("\nInvalid password! Please enter the correct password.\n");
+                return;
             }
         }
     }
-    printf("\nThis account does'nt exists. Please signup to create your account!\n");
+    fclose(fptr);
+    // printf("\nThis account doesn't exists. Please signup to create your account!\n");
     main();
 }
 
+//!  more to discover
 // Function that initializes the hotels
 void hotel_initialize()
 {
