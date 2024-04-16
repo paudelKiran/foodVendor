@@ -17,26 +17,32 @@ Concepts used: Modular approach in programming
 // User details for sign-up
 struct userDetail
 {
-    // int age;
     char name[100];
     char email[100];
     char mobile[11];
     char pass[15];
 };
 
+struct food
+{
+    char hotel_name[100];
+    char name[100];
+    int price;
+};
+
 // Hotel details & their food details
 struct hotelDetails
 {
     char hotel_name[100];
-    char first_food[50];
-    char second_food[50];
-    char third_food[50];
-    int first, second, third, fourth;
+    char location[100];
+    char email[100];
+    char mobile[11];
+    char pass[15];
 };
 
 // Initialize the hotels & user details
 struct hotelDetails hotel[6];
-struct userDetail user[100];
+// struct userDetail user[100];
 
 // Decalarations of functions
 int mainMenu();
@@ -54,11 +60,11 @@ void hotels(int hotel_choice);
 int flag = 1, i, j = 0, At = -1, Dot = -1, caps = 0;
 int small = 0, special = 0, numbers = 0;
 int success = 0, validate, choice;
-char temp_name[100], temp_email[100];
-char temp_mobile[11];
+char temp_name[100], temp_email[100], temp_mobile[11];
 int total = 0, food_choice, n;
 int hotel_choice, search_choice, confirm;
 int ch, food, hotel_id;
+int role = 0;
 
 int main()
 {
@@ -66,23 +72,25 @@ int main()
     return 0;
 }
 
-// Food Ordering system
 int mainMenu()
 {
-    // system("cls");
-    printf("\n\n\t\tWelcome to our Food Ordering System\n");
+    printf("\n\n\t\tWelcome to our Food Vendor System\n");
+    printf("What do you want to continue as:");
+    printf("1.Customer");
+    printf("2.Restaurant Owner");
+    scanf("%d", &role);
+
     while (1)
     {
         printf("\n1. Sign-up\n2. Login\n3. Exit\n");
         printf("Please enter your choice\n");
 
         scanf("%d", &choice);
-
-        // switch cases
         switch (choice)
         {
         // for sign-up
         case 1:
+
             signup();
             break;
         // for login
@@ -101,13 +109,10 @@ int mainMenu()
     return 0;
 }
 
-// function signup
 void signup()
 {
     char temp_pass1[15], temp_pass2[15];
     printf("\n\n***********SINGUP************\n\n");
-
-    // clears the input buffer
 
     printf("Enter Your name: ");
     scanf("%s", temp_name);
@@ -356,231 +361,231 @@ void login()
     // printf("\nThis account doesn't exists. Please signup to create your account!\n");
 }
 
-//!  more to discover
-// Function that initializes the hotels
-void hotel_initialize()
-{
-    // Initialize the structure with foods name & their cost
-    strcpy(hotel[1].hotel_name, "Freshers Delight");
-    strcpy(hotel[1].first_food, "Veg momo");
-    strcpy(hotel[1].second_food, "Pizza");
-    strcpy(hotel[1].third_food, "Tandoori Sauce Potato");
-    hotel[1].first = 730;
-    hotel[1].second = 100;
-    hotel[1].third = 195;
+// //!  more to discover
+// // Function that initializes the hotels
+// void hotel_initialize()
+// {
+//     // Initialize the structure with foods name & their cost
+//     strcpy(hotel[1].hotel_name, "Freshers Delight");
+//     strcpy(hotel[1].first_food, "Veg momo");
+//     strcpy(hotel[1].second_food, "Pizza");
+//     strcpy(hotel[1].third_food, "Tandoori Sauce Potato");
+//     hotel[1].first = 730;
+//     hotel[1].second = 100;
+//     hotel[1].third = 195;
 
-    strcpy(hotel[2].hotel_name, "Barbeque Nation");
-    strcpy(hotel[2].first_food, "Non veg momos");
-    strcpy(hotel[2].second_food, "Noodles");
-    strcpy(hotel[2].third_food, "Chicken crispy finger");
-    hotel[2].first = 80;
-    hotel[2].second = 85;
-    hotel[2].third = 380;
+//     strcpy(hotel[2].hotel_name, "Barbeque Nation");
+//     strcpy(hotel[2].first_food, "Non veg momos");
+//     strcpy(hotel[2].second_food, "Noodles");
+//     strcpy(hotel[2].third_food, "Chicken crispy finger");
+//     hotel[2].first = 80;
+//     hotel[2].second = 85;
+//     hotel[2].third = 380;
 
-    strcpy(hotel[3].hotel_name, "Piccante");
-    strcpy(hotel[3].first_food, "Chicken_Biriyani");
-    strcpy(hotel[3].second_food, "Prawn");
-    strcpy(hotel[3].third_food, "Fish crispy finger");
-    hotel[3].first = 700;
-    hotel[3].second = 100;
-    hotel[3].third = 250;
+//     strcpy(hotel[3].hotel_name, "Piccante");
+//     strcpy(hotel[3].first_food, "Chicken_Biriyani");
+//     strcpy(hotel[3].second_food, "Prawn");
+//     strcpy(hotel[3].third_food, "Fish crispy finger");
+//     hotel[3].first = 700;
+//     hotel[3].second = 100;
+//     hotel[3].third = 250;
 
-    strcpy(hotel[4].hotel_name, "Balkh Bukhara");
-    strcpy(hotel[4].first_food, "Chicken Biriyani");
-    strcpy(hotel[4].second_food, "Cheese momo");
-    strcpy(hotel[4].third_food, "Veg chilly momo");
-    hotel[4].first = 500;
-    hotel[4].second = 120;
-    hotel[4].third = 230;
+//     strcpy(hotel[4].hotel_name, "Balkh Bukhara");
+//     strcpy(hotel[4].first_food, "Chicken Biriyani");
+//     strcpy(hotel[4].second_food, "Cheese momo");
+//     strcpy(hotel[4].third_food, "Veg chilly momo");
+//     hotel[4].first = 500;
+//     hotel[4].second = 120;
+//     hotel[4].third = 230;
 
-    strcpy(hotel[5].hotel_name, "Hard Rock Cafe");
-    strcpy(hotel[5].first_food, "Chicken noodles");
-    strcpy(hotel[5].second_food, "Honey potato");
-    strcpy(hotel[5].third_food, "French Fires");
-    hotel[5].first = 240;
-    hotel[5].second = 150;
-    hotel[5].third = 190;
-}
+//     strcpy(hotel[5].hotel_name, "Hard Rock Cafe");
+//     strcpy(hotel[5].first_food, "Chicken noodles");
+//     strcpy(hotel[5].second_food, "Honey potato");
+//     strcpy(hotel[5].third_food, "French Fires");
+//     hotel[5].first = 240;
+//     hotel[5].second = 150;
+//     hotel[5].third = 190;
+// }
 
-// Search by hotels function
-void search_by_hotels()
-{
-    hotel_initialize();
-    printf("\nPlease Choose the hotel\n");
-    printf("1. %s\n2. %s\n3. %s\n4. %s, \n5. %s\n6. Exit", hotel[1].hotel_name, hotel[2].hotel_name, hotel[3].hotel_name, hotel[4].hotel_name, hotel[5].hotel_name);
-    printf("\nPlease enter your choice: ");
+// // Search by hotels function
+// void search_by_hotels()
+// {
+//     hotel_initialize();
+//     printf("\nPlease Choose the hotel\n");
+//     printf("1. %s\n2. %s\n3. %s\n4. %s, \n5. %s\n6. Exit", hotel[1].hotel_name, hotel[2].hotel_name, hotel[3].hotel_name, hotel[4].hotel_name, hotel[5].hotel_name);
+//     printf("\nPlease enter your choice: ");
 
-    scanf("%d", &hotel_choice);
+//     scanf("%d", &hotel_choice);
 
-    if (hotel_choice > 6)
-    {
-        printf("Please Enter the valid choice.\n");
-        search_by_hotels();
-    }
-    else if (hotel_choice == 6)
-        exit(1);
-    else
-        hotels(hotel_choice);
-}
+//     if (hotel_choice > 6)
+//     {
+//         printf("Please Enter the valid choice.\n");
+//         search_by_hotels();
+//     }
+//     else if (hotel_choice == 6)
+//         exit(1);
+//     else
+//         hotels(hotel_choice);
+// }
 
-// Function to implement the hotel
-void hotels(int hotel_choice)
-{
-    total = 0;
-    while (1)
-    {
-        // Displays the list of foods available in selected hotel
-        printf("\nList of foods available in %s\n", hotel[hotel_choice].hotel_name);
-        printf("\nFood item---->Price");
-        printf("\n1. %s---->Rs: %d", hotel[hotel_choice].first_food, hotel[hotel_choice].first);
-        printf("\n2. %s---->Rs: %d", hotel[hotel_choice].second_food, hotel[hotel_choice].second);
-        printf("\n3. %s---->Rs: %d", hotel[hotel_choice].third_food, hotel[hotel_choice].third);
+// // Function to implement the hotel
+// void hotels(int hotel_choice)
+// {
+//     total = 0;
+//     while (1)
+//     {
+//         // Displays the list of foods available in selected hotel
+//         printf("\nList of foods available in %s\n", hotel[hotel_choice].hotel_name);
+//         printf("\nFood item---->Price");
+//         printf("\n1. %s---->Rs: %d", hotel[hotel_choice].first_food, hotel[hotel_choice].first);
+//         printf("\n2. %s---->Rs: %d", hotel[hotel_choice].second_food, hotel[hotel_choice].second);
+//         printf("\n3. %s---->Rs: %d", hotel[hotel_choice].third_food, hotel[hotel_choice].third);
 
-        printf("\n4. Cart\n5. Exit");
-        printf("\nPlease enter your choice: ");
-        scanf("%d", &food_choice);
+//         printf("\n4. Cart\n5. Exit");
+//         printf("\nPlease enter your choice: ");
+//         scanf("%d", &food_choice);
 
-        // Get the input for no of foods to calculate the total amount.
-        if (food_choice == 1)
-        {
-            printf("Please Enter the Count of %s: ", hotel[hotel_choice].first_food);
-            scanf("%d", &n);
-            total = total + (n * hotel[hotel_choice].first);
-        }
-        else if (food_choice == 2)
-        {
-            printf("Please Enter the Count of %s: ", hotel[hotel_choice].second_food);
-            scanf("%d", &n);
-            total = total + (n * hotel[hotel_choice].second);
-        }
-        else if (food_choice == 3)
-        {
-            printf("Please Enter the Count of %s: ", hotel[hotel_choice].third_food);
-            scanf("%d", &n);
-            total = total + (n * hotel[hotel_choice].third);
-        }
+//         // Get the input for no of foods to calculate the total amount.
+//         if (food_choice == 1)
+//         {
+//             printf("Please Enter the Count of %s: ", hotel[hotel_choice].first_food);
+//             scanf("%d", &n);
+//             total = total + (n * hotel[hotel_choice].first);
+//         }
+//         else if (food_choice == 2)
+//         {
+//             printf("Please Enter the Count of %s: ", hotel[hotel_choice].second_food);
+//             scanf("%d", &n);
+//             total = total + (n * hotel[hotel_choice].second);
+//         }
+//         else if (food_choice == 3)
+//         {
+//             printf("Please Enter the Count of %s: ", hotel[hotel_choice].third_food);
+//             scanf("%d", &n);
+//             total = total + (n * hotel[hotel_choice].third);
+//         }
 
-        // Once the user, completed their order, they can go to cart by giving choice as 4.
-        else if (food_choice == 4)
-        {
-            cart();
-        }
-        else if (food_choice == 5)
-        {
-            search_by_hotels();
-        }
-        else
-        {
-            printf("\nPlease Enter the valid Choice\n\n");
-        }
-    }
-}
+//         // Once the user, completed their order, they can go to cart by giving choice as 4.
+//         else if (food_choice == 4)
+//         {
+//             cart();
+//         }
+//         else if (food_choice == 5)
+//         {
+//             search_by_hotels();
+//         }
+//         else
+//         {
+//             printf("\nPlease Enter the valid Choice\n\n");
+//         }
+//     }
+// }
 
-// Search by food function
-void search_by_food()
-{
-    total = 0;
+// // Search by food function
+// void search_by_food()
+// {
+//     total = 0;
 
-    // Initialize all the hotels and their foods
-    hotel_initialize();
-    while (1)
-    {
-        printf("\nPlease choose the food you want to eat.");
-        printf("\nFood Item----> Price\n");
-        printf("\n1. %s----> %d\n2. %s---->%d\n3. %s---->%d", hotel[1].first_food, hotel[1].first, hotel[1].second_food, hotel[1].second, hotel[1].third_food, hotel[1].third);
-        printf("\n4. %s---->%d\n5. %s---->%d\n6. %s---->%d", hotel[2].first_food, hotel[2].first, hotel[2].second_food, hotel[2].second, hotel[2].third_food, hotel[2].third);
-        printf("\n7. %s---->%d\n8. %s---->%d\n9. %s---->%d", hotel[3].first_food, hotel[3].first, hotel[3].second_food, hotel[3].second, hotel[3].third_food, hotel[3].third);
-        printf("\n10. %s---->%d\n11. %s---->%d\n12. %s---->%d", hotel[4].first_food, hotel[4].first, hotel[4].second_food, hotel[4].second, hotel[4].third_food, hotel[4].third);
-        printf("\n13. %s---->%d\n14. %s---->%d\n15. %s---->%d", hotel[5].first_food, hotel[5].first, hotel[5].second_food, hotel[5].second, hotel[5].third_food, hotel[5].third);
+//     // Initialize all the hotels and their foods
+//     hotel_initialize();
+//     while (1)
+//     {
+//         printf("\nPlease choose the food you want to eat.");
+//         printf("\nFood Item----> Price\n");
+//         printf("\n1. %s----> %d\n2. %s---->%d\n3. %s---->%d", hotel[1].first_food, hotel[1].first, hotel[1].second_food, hotel[1].second, hotel[1].third_food, hotel[1].third);
+//         printf("\n4. %s---->%d\n5. %s---->%d\n6. %s---->%d", hotel[2].first_food, hotel[2].first, hotel[2].second_food, hotel[2].second, hotel[2].third_food, hotel[2].third);
+//         printf("\n7. %s---->%d\n8. %s---->%d\n9. %s---->%d", hotel[3].first_food, hotel[3].first, hotel[3].second_food, hotel[3].second, hotel[3].third_food, hotel[3].third);
+//         printf("\n10. %s---->%d\n11. %s---->%d\n12. %s---->%d", hotel[4].first_food, hotel[4].first, hotel[4].second_food, hotel[4].second, hotel[4].third_food, hotel[4].third);
+//         printf("\n13. %s---->%d\n14. %s---->%d\n15. %s---->%d", hotel[5].first_food, hotel[5].first, hotel[5].second_food, hotel[5].second, hotel[5].third_food, hotel[5].third);
 
-        // Move to cart
-        printf("\n16. Cart");
-        // For exit
-        printf("\n17. Exit");
+//         // Move to cart
+//         printf("\n16. Cart");
+//         // For exit
+//         printf("\n17. Exit");
 
-        printf("\nPlease Enter Your Choice: ");
-        scanf("%d", &food);
-        if (food > 17)
-        {
-            printf("Please Enter a valid choice.\n");
-            search_by_food();
-        }
-        // Moves to the cart functionality
-        else if (food == 16)
-            cart();
-        else if (food == 17)
-            return;
-        // Call food_order functionality to get the no of foods and to calculate the total amount of the order.
-        else
-            food_order(food);
-    }
-}
+//         printf("\nPlease Enter Your Choice: ");
+//         scanf("%d", &food);
+//         if (food > 17)
+//         {
+//             printf("Please Enter a valid choice.\n");
+//             search_by_food();
+//         }
+//         // Moves to the cart functionality
+//         else if (food == 16)
+//             cart();
+//         else if (food == 17)
+//             return;
+//         // Call food_order functionality to get the no of foods and to calculate the total amount of the order.
+//         else
+//             food_order(food);
+//     }
+// }
 
-// Function to implement the food order functionality
-void food_order(int food)
-{
-    if (food >= 1 && food <= 3)
-        hotel_id = 1;
-    else if (food >= 4 && food <= 6)
-        hotel_id = 2;
-    else if (food >= 7 && food <= 9)
-        hotel_id = 3;
-    else if (food >= 10 && food <= 13)
-        hotel_id = 4;
-    else
-        hotel_id = 5;
-    if ((food % 3) == 1)
-    {
-        printf("Please Enter the Count of %s: ", hotel[hotel_id].first_food);
-        scanf("%d", &n);
-        total = total + (n * hotel[hotel_id].first);
-    }
-    else if ((food % 3) == 2)
-    {
-        printf("Please Enter the Count of %s: ", hotel[hotel_id].second_food);
-        scanf("%d", &n);
-        total = total + (n * hotel[hotel_id].second);
-    }
-    else if ((food % 3) == 0)
-    {
-        printf("Please Enter the Count of %s: ", hotel[hotel_id].third_food);
-        scanf("%d", &n);
-        total = total + (n * hotel[hotel_id].third);
-    }
-}
+// // Function to implement the food order functionality
+// void food_order(int food)
+// {
+//     if (food >= 1 && food <= 3)
+//         hotel_id = 1;
+//     else if (food >= 4 && food <= 6)
+//         hotel_id = 2;
+//     else if (food >= 7 && food <= 9)
+//         hotel_id = 3;
+//     else if (food >= 10 && food <= 13)
+//         hotel_id = 4;
+//     else
+//         hotel_id = 5;
+//     if ((food % 3) == 1)
+//     {
+//         printf("Please Enter the Count of %s: ", hotel[hotel_id].first_food);
+//         scanf("%d", &n);
+//         total = total + (n * hotel[hotel_id].first);
+//     }
+//     else if ((food % 3) == 2)
+//     {
+//         printf("Please Enter the Count of %s: ", hotel[hotel_id].second_food);
+//         scanf("%d", &n);
+//         total = total + (n * hotel[hotel_id].second);
+//     }
+//     else if ((food % 3) == 0)
+//     {
+//         printf("Please Enter the Count of %s: ", hotel[hotel_id].third_food);
+//         scanf("%d", &n);
+//         total = total + (n * hotel[hotel_id].third);
+//     }
+// }
 
-// Cart function implimentation
-void cart()
-{
-    printf("\n\n**********Cart**********\n");
-    printf("\nYour Total Order Amount is: %d", total);
-    printf("\nDo You wish to order? Choose 1. Yes 2. No: ");
-    scanf("%d", &ch);
-    if (ch == 1)
-    {
-        printf("\n\nThank for ordering! Your order is confirmed Your Food is on the way.");
-        exit(1);
-    }
-    else if (ch == 2)
-    {
-        printf("\nDo You want to exit -1 or Go back -0");
-        scanf("%d", &confirm);
-        if (confirm == 1)
-        {
+// // Cart function implimentation
+// void cart()
+// {
+//     printf("\n\n**********Cart**********\n");
+//     printf("\nYour Total Order Amount is: %d", total);
+//     printf("\nDo You wish to order? Choose 1. Yes 2. No: ");
+//     scanf("%d", &ch);
+//     if (ch == 1)
+//     {
+//         printf("\n\nThank for ordering! Your order is confirmed Your Food is on the way.");
+//         exit(1);
+//     }
+//     else if (ch == 2)
+//     {
+//         printf("\nDo You want to exit -1 or Go back -0");
+//         scanf("%d", &confirm);
+//         if (confirm == 1)
+//         {
 
-            printf("\n\nOops! Your order is cancelled!! Exiting..");
-            printf("Thank You visit again!\n");
-            exit(1);
-        }
-        else
-        {
-            printf("\n\nThank You\n\n");
-            login();
-        }
-    }
-    else
-    {
-        printf("\n\nPlease Enter the correct choice\n");
-        cart();
-    }
-}
+//             printf("\n\nOops! Your order is cancelled!! Exiting..");
+//             printf("Thank You visit again!\n");
+//             exit(1);
+//         }
+//         else
+//         {
+//             printf("\n\nThank You\n\n");
+//             login();
+//         }
+//     }
+//     else
+//     {
+//         printf("\n\nPlease Enter the correct choice\n");
+//         cart();
+//     }
+// }
