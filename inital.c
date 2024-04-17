@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Structs to hold customer and restaurant owner details
 struct FoodItem
 {
     char name[100];
     float price;
-    char restaurantName[100];
+    char restaurantEmail[100];
 };
 
 struct Customer
@@ -27,6 +26,14 @@ struct RestaurantOwner
     char location[100];
 };
 
+struct Bill
+{
+    char customerEmail[100];
+    struct FoodItem foodItem;
+    int quantity;
+    float total;
+};
+
 // Function prototypes
 void customerSignup();
 void restaurantOwnerSignup();
@@ -34,29 +41,35 @@ int customerLogin();
 int restaurantOwnerLogin();
 int verifyEmail(char *email);
 int verifyPassword(char *password);
-void restaurantOwnerPanel(char *restroName);
-void addFoodItem(char *restroName);
-void removeFoodItem(char *restroName);
-void displayFoodItems(char *restroName);
+void restaurantOwnerPanel();
+void addFoodItem();
+void removeFoodItem();
+void displayFoodItems(char *restroEmail);
 void searchByHotel();
 void searchByFood();
 void customerPanel();
+void generateBill(struct FoodItem *orderedItem, int quantity);
+void viewTransactions(char *transactor);
+void exit_program();
+
+char customerEmail[100],
+    restroEmail[100];
 
 int main()
 {
-
+    printf("\n\t****************** WELCOME TO FOOD VENDOR SYSTEM ****************** \n");
     int choice;
 
     while (1)
     {
-        printf("1. Customer Signup\n");
+        printf("\n1. Customer Signup\n");
         printf("2. Restaurant Owner Signup\n");
         printf("3. Customer Login\n");
         printf("4. Restaurant Owner Login\n");
         printf("5. Exit\n");
 
         printf("Enter your choice: ");
-        scanf("%d", &choice);
+        scanf(" %d", &choice);
 
         switch (choice)
         {
@@ -73,6 +86,7 @@ int main()
             restaurantOwnerLogin();
             break;
         case 5:
+            exit_program();
             exit(0);
             break;
         default:
@@ -123,22 +137,18 @@ void customerSignup()
 {
 
     struct Customer customer, readCustomer;
-    printf("\n\n");
     // Get customer details
+    printf("\n\t-------------CUSTOMER SIGNUP  ------------\n");
     while ((getchar()) != '\n')
         ;
     printf("Enter name: ");
     gets(customer.name);
-    while ((getchar()) != '\n')
-        ;
-    printf("Enter phone: ");
-    scanf("%s", customer.phone);
-    while ((getchar()) != '\n')
-        ;
+
     printf("Enter email: ");
-    scanf("%s", customer.email);
-    while ((getchar()) != '\n')
-        ;
+    scanf(" %s", customer.email);
+
+    printf("Enter phone: ");
+    scanf(" %s", customer.phone);
 
     // Check if email already exists
     FILE *fp;
@@ -154,7 +164,7 @@ void customerSignup()
     fclose(fp);
 
     printf("Enter password: ");
-    scanf("%s", customer.password);
+    scanf(" %s", customer.password);
 
     // Validate email and password
     verifyEmail(customer.email);
@@ -173,21 +183,26 @@ void restaurantOwnerSignup()
 {
 
     struct RestaurantOwner owner, readOwner;
-
-    // Get restaurant owner details
-    printf("Enter Restaurant name: ");
-    scanf("%s", owner.name);
+    printf("\n\t------------- RESTAURANT OWNER SIGNUP ------------\n");
     while ((getchar()) != '\n')
         ;
+    // Get restaurant owner details
+    printf("Enter Restaurant name: ");
+    gets(owner.name);
 
     printf("Enter phone: ");
-    scanf("%s", owner.phone);
+    scanf(" %s", owner.phone);
 
     printf("Enter email: ");
-    scanf("%s", owner.email);
+    scanf(" %s", owner.email);
 
     FILE *fp1;
     fp1 = fopen("customers.txt", "r");
+    if (fp1 == NULL)
+    {
+        printf("Error opening file");
+        return;
+    }
     while (fread(&readOwner, sizeof(struct Customer), 1, fp1))
     {
         if (strcmp(owner.email, readOwner.email) == 0)
@@ -199,10 +214,10 @@ void restaurantOwnerSignup()
     fclose(fp1);
 
     printf("Enter password: ");
-    scanf("%s", owner.password);
+    scanf(" %s", owner.password);
 
     printf("Enter location: ");
-    scanf("%s", owner.location);
+    scanf(" %s", owner.location);
 
     verifyEmail(owner.email);
     verifyPassword(owner.password);
@@ -210,6 +225,11 @@ void restaurantOwnerSignup()
     // Save restaurant owner details to file
     FILE *fp2;
     fp2 = fopen("restaurant_owners.txt", "a");
+    if (fp2 == NULL)
+    {
+        printf("Error opening file");
+        return;
+    }
     fwrite(&owner, sizeof(struct RestaurantOwner), 1, fp2);
     fclose(fp2);
 
@@ -223,17 +243,35 @@ int restaurantOwnerLogin()
     char email[100], password[20];
 
     struct RestaurantOwner owner;
-
+    printf("\n\t------------- RESTAURANT OWNER LOGIN ------------\n");
     // Input email and password
-    printf("Enter email: ");
+    printf("\nEnter email: ");
     scanf("%s", email);
 
     printf("Enter password: ");
     scanf("%s", password);
 
+    if (!verifyEmail(email))
+    {
+        printf("Invalid email!\n");
+        return 0;
+    }
+
+    // Verify password
+    if (!verifyPassword(password))
+    {
+        printf("Invalid password!\n");
+        return 0;
+    }
+
     // Read all restaurant owners from file
     FILE *fp;
     fp = fopen("restaurant_owners.txt", "rb");
+    if (fp == NULL)
+    {
+        printf("Error opening file");
+        return;
+    }
 
     while (fread(&owner, sizeof(struct RestaurantOwner), 1, fp))
     {
@@ -242,8 +280,9 @@ int restaurantOwnerLogin()
             strcmp(password, owner.password) == 0)
         {
             printf("Login successful!\n");
-            system("cls");
-            restaurantOwnerPanel(owner.name);
+            strcpy(restroEmail, owner.email);
+            // system("clear");
+            restaurantOwnerPanel();
             fclose(fp);
             return 1;
         }
@@ -258,9 +297,9 @@ int customerLogin()
     char email[100], password[20];
 
     struct Customer customer;
-
+    printf("\n\t------------- CUSTOMER LOGIN ------------\n");
     // Input email and password
-    printf("Enter email: ");
+    printf("\nEnter email: ");
     scanf("%s", email);
 
     printf("Enter password: ");
@@ -284,6 +323,11 @@ int customerLogin()
     FILE *fp;
     fp = fopen("customers.txt", "rb");
 
+    if (fp == NULL)
+    {
+        printf("Error opening file");
+        return;
+    }
     while (fread(&customer, sizeof(struct Customer), 1, fp))
     {
 
@@ -292,7 +336,8 @@ int customerLogin()
             strcmp(password, customer.password) == 0)
         {
             printf("Login successful!\n");
-            system("cls");
+            strcpy(customerEmail, customer.email);
+            // system("clear");
             customerPanel();
             fclose(fp);
             return 1;
@@ -307,45 +352,46 @@ int customerLogin()
 
 // Restaurant owner panel
 
-void restaurantOwnerPanel(char *restroName)
+void restaurantOwnerPanel()
 {
     int choice;
 
     while (1)
     {
-        printf("\n\n");
+        printf("\n\t****************** RESTAURANT OWNER PANEL ****************** \n");
+        printf("\n");
         printf("1. Add Food Item\n");
         printf("2. Remove Food Item\n");
-        printf("3. View Orders and Transactions\n");
-        printf("4. Exit\n");
+        printf("3. View Food Items\n");
+        printf("4. View Transactions\n");
+        printf("5. Exit\n");
 
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
+        printf("Enter your choice : ");
+        while ((getchar()) != '\n')
+            ;
+        scanf(" %d", &choice);
 
-        switch (choice)
-        {
-        case 1:
-            addFoodItem(restroName);
-            break;
-        case 2:
-            removeFoodItem(restroName);
-            break;
-        case 3:
-            displayFoodItems(restroName);
-            break;
-        case 4:
+        if (choice == 1)
+            addFoodItem();
+        else if (choice == 2)
+            removeFoodItem();
+        else if (choice == 3)
+            displayFoodItems(restroEmail);
+        else if (choice == 4)
+            viewTransactions(restroEmail);
+        else if (choice == 5)
             return;
-        default:
+        else
             printf("Invalid choice. Please try again.\n");
-        }
     }
 }
 
 // Define menu array
-void addFoodItem(char *restroName)
+void addFoodItem()
 {
     char name[100];
     float price;
+    printf("\n\t------------- ADD FOOD ITEM ------------\n");
     while ((getchar()) != '\n')
         ;
     printf("Enter food name: ");
@@ -356,10 +402,15 @@ void addFoodItem(char *restroName)
 
     // Create new food item
     FILE *fp = fopen("menu.txt", "a");
+    if (fp == NULL)
+    {
+        printf("Error opening file");
+        return;
+    }
     struct FoodItem item;
     strcpy(item.name, name);
     item.price = price;
-    strcpy(item.restaurantName, restroName);
+    strcpy(item.restaurantEmail, restroEmail);
 
     fwrite(&item, 1, sizeof(struct FoodItem), fp);
 
@@ -369,16 +420,22 @@ void addFoodItem(char *restroName)
 }
 
 // Display food items
-void displayFoodItems(char *restroName)
+void displayFoodItems(char *restroEmail)
 {
-    printf("\n\n");
+    printf("\n\t------------- FOOD ITEMS ------------\n");
     FILE *fp = fopen("menu.txt", "rb");
 
     struct FoodItem item;
     int count = 1;
+
+    if (fp == NULL)
+    {
+        printf("Error opening file");
+        return;
+    }
     while (fread(&item, sizeof(item), 1, fp))
     {
-        if (strcmp(item.restaurantName, restroName) == 0)
+        if (strcmp(item.restaurantEmail, restroEmail) == 0)
         {
             printf("%d.%s --> %.2f\n", count, item.name, item.price);
             count++;
@@ -389,20 +446,24 @@ void displayFoodItems(char *restroName)
 }
 
 // Remove food item belonging to current owner
-void removeFoodItem(char *restroName)
+void removeFoodItem()
 {
-    printf("\n\n");
-    displayFoodItems(restroName);
+    printf("\n\t------------- REMOVE FOOD ITEM ------------\n");
+    displayFoodItems(restroEmail);
     int rmv, count = 1;
     struct FoodItem item;
     FILE *fp = fopen("menu.txt", "rb");
     FILE *tmp = fopen("tmp.txt", "a");
     printf("Input option which you want to remove :");
     scanf("%d", &rmv);
-
+    if (fp == NULL && tmp == NULL)
+    {
+        printf("Error opening file");
+        return;
+    }
     while (fread(&item, sizeof(item), 1, fp))
     {
-        if (!(strcmp(item.restaurantName, restroName) == 0 && count == rmv))
+        if (!(strcmp(item.restaurantEmail, restroEmail) == 0 && count == rmv))
         {
             fwrite(&item, 1, sizeof(item), tmp);
         }
@@ -416,37 +477,43 @@ void removeFoodItem(char *restroName)
 }
 
 // View transactions
-// void viewTransactions()
-// {
-//     FILE *fp = fopen("transactions.txt", "r");
+void viewTransactions(char *transactor)
+{
+    printf("\n\t------------- TRANSACTIONS DETAILS ------------\n");
+    int count = 1;
+    FILE *fp = fopen("bill.txt", "rb");
 
-//     struct Transaction txn;
-//     while (fread(&txn, sizeof(txn), 1, fp))
-//     {
-//         printf("Customer: %s, Food: %s, Price: %.2f\n",
-//                txn.customerName, txn.foodName, txn.price);
-//     }
+    struct Bill txn;
+    while (fread(&txn, sizeof(txn), 1, fp))
+    {
+        if (strcmp(transactor, txn.foodItem.restaurantEmail) == 0 || strcmp(transactor, txn.customerEmail) == 0)
+        {
+            printf("%d. %s --> %d --> %.2f\n", count, txn.foodItem.name, txn.quantity, txn.total);
+        }
+        count++;
+    }
 
-//     fclose(fp);
-// }
-// Search food items by hotel
+    fclose(fp);
+}
 
 // Customer panel
 void customerPanel()
 {
-    int choice;
+    int ch;
 
     while (1)
     {
+        printf("\n\t****************** CUSTOMER PANEL ****************** \n");
         printf("\nCustomer Panel\n");
         printf("1. View Food Items\n");
         printf("2. View Food Items By Hotel\n");
-        printf("3. View Orders\n");
+        printf("3. View Order History\n");
         printf("4. Exit\n");
+        getchar();
         printf("Enter your choice: ");
-        scanf("%d", &choice);
+        scanf("%d", &ch);
 
-        switch (choice)
+        switch (ch)
         {
         case 1:
             searchByFood();
@@ -457,7 +524,7 @@ void customerPanel()
             break;
 
         case 3:
-            viewTransactions();
+            viewTransactions(customerEmail);
             break;
 
         case 4:
@@ -472,16 +539,22 @@ void customerPanel()
 // choose hotel and show food menu of it
 void searchByHotel()
 {
-    printf("\nHotels listed are:");
+    printf("\n\t------------- HOTELS  ------------\n");
     int count = 1;
-    FILE *fp = fopen("restaurant_owner.txt", "rb");
-    int hotel;
+    FILE *fp = fopen("restaurant_owners.txt", "rb");
+    int hotel, food, quantity;
     char hotel_name[100];
 
-    struct RestaurantOwner item;
-    while (fread(&item, sizeof(item), 1, fp))
+    struct RestaurantOwner restro;
+
+    if (fp == NULL)
     {
-        printf("\t%d. %s at %s \n", count, item.name, item.location);
+        printf("Error opening file");
+        return;
+    }
+    while (fread(&restro, sizeof(restro), 1, fp))
+    {
+        printf("\t%d. %s at %s \n", count, restro.name, restro.location);
         count++;
     }
 
@@ -489,39 +562,114 @@ void searchByHotel()
     scanf("%d", &hotel);
 
     // finding hotel name from users inputed number
-    rewind(fp);
-    count = 1;
-    while (fread(&item, sizeof(item), 1, fp))
-    {
-        if (count == hotel)
-        {
-            strcpy(hotel_name, item.name);
-        }
-        count++;
-    }
-
+    fseek(fp, (hotel - 1) * sizeof(struct RestaurantOwner), SEEK_SET);
+    fread(&restro, sizeof(restro), 1, fp);
     fclose(fp);
 
-    // search food listed in menu of searched hotel
-    displayFoodItems(hotel_name);
+    // display food listed in menu of searched hotel
+    displayFoodItems(restro.name);
+    printf("Which food do you want to have ?(input number) : ");
+    scanf("%d", &food);
+    printf("Quantity : ");
+    scanf("%d", &quantity);
+
+    // finding the food that the user selected and generating bill
+    FILE *fpt = fopen("menu.txt", "rb");
+
+    struct FoodItem item;
+    int loop = 1;
+    if (fpt == NULL)
+    {
+        printf("Error opening file");
+        return;
+    }
+    while (fread(&item, sizeof(item), 1, fpt))
+    {
+        if (strcmp(item.restaurantEmail, restroEmail) == 0)
+        {
+            if (loop == food)
+            {
+                fclose(fpt);
+                generateBill(&item, quantity);
+                break;
+            }
+            loop++;
+        }
+    }
+
+    fclose(fpt);
 }
 
 // display all food items
 void searchByFood()
 {
-    printf("\nFoods available right now are:\n");
+    printf("\n\t------------- FOOD AVAILABLE ------------\n");
     int count = 1;
+    int ch, quantity;
     FILE *fp = fopen("menu.txt", "rb");
-    int food;
 
-    struct FoodItem item;
-    while (fread(&item, sizeof(item), 1, fp))
+    if (fp == NULL)
     {
-        printf("\t%d. %s --> %s -->%s \n", count, item.name, item.price, item.restaurantName);
+        printf("Error opening file");
+        return;
+    }
+
+    struct FoodItem food;
+    while (fread(&food, sizeof(struct FoodItem), 1, fp))
+    {
+        printf("\t%d. %s --> %f \n", count, food.name, food.price);
         count++;
     }
     printf("Which food do you want to have ?(input number) : ");
-    scanf("%d", &food);
-
+    scanf("%d", &ch);
+    printf("Quantity : ");
+    scanf("%d", &quantity);
+    // checking the food
+    fseek(fp, (ch - 1) * sizeof(struct FoodItem), SEEK_SET);
+    if (fread(&food, sizeof(food), 1, fp) != 1)
+    {
+        printf("Error reading food item");
+    }
     fclose(fp);
+    if (fp != NULL)
+    {
+        generateBill(&food, quantity);
+    }
+}
+
+// generate bill
+void generateBill(struct FoodItem *orderedItem, int quantity)
+{
+    // Print bill
+    printf("\n\t------------- BILL ------------\n");
+    printf("Item: %s\n", orderedItem->name);
+    printf("Price: %.2f\n", orderedItem->price);
+    printf("Total: %.2f\n", (orderedItem->price) * quantity);
+    printf("\tThank You for Ordering!! \n");
+
+    // Open bill file and write bill
+    FILE *fp = fopen("bill.txt", "a");
+    if (fp == NULL)
+    {
+        printf("Error opening file");
+        return;
+    }
+
+    struct Bill bill;
+    strcpy(bill.customerEmail, customerEmail);
+    strcpy(bill.foodItem.name, orderedItem->name);
+    bill.foodItem.price = orderedItem->price;
+    bill.quantity = quantity;
+    bill.total = quantity * (orderedItem->price);
+    fclose(fp);
+}
+
+void exit_program()
+{
+    printf("\n\n\t------------- SEE YOU AGAIN ------------\n");
+    printf("\tCreated  by:\n");
+    printf("\tKIRAN PAUDEL\t(080BCT019)\n");
+    printf("\tALIN TIMELSANA\t(080BCT003)\n");
+    printf("\tABHISHEK BHATTARAI\t(080BCT001)\n");
+    exit(0);
 }
