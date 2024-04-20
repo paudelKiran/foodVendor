@@ -88,10 +88,10 @@ int main()
             break;
         case 5:
             exit_program();
-            exit(0);
             break;
         default:
             printf("Invalid choice\n");
+            exit(0);
         }
     }
 
@@ -502,9 +502,10 @@ void viewTransactions(char *transactor)
     struct Bill txn;
     while (fread(&txn, sizeof(txn), 1, fp))
     {
+        printf("S.N\t\tItems\t\tQuantity\tTotal Amount\n");
         if (strcmp(transactor, txn.foodItem.restaurantEmail) == 0 || strcmp(transactor, txn.customerEmail) == 0)
         {
-            printf("%d. %s --> %d --> %.2f\n", count, txn.foodItem.name, txn.quantity, txn.total);
+            printf("%d\t\t%s\t\t%d\t\t%.2f\n", count, txn.foodItem.name, txn.quantity, txn.total);
         }
         count++;
     }
@@ -687,6 +688,7 @@ void generateBill(struct FoodItem *orderedItem, int quantity)
     bill.foodItem.price = orderedItem->price;
     bill.quantity = quantity;
     bill.total = quantity * (orderedItem->price);
+    fwrite(&bill, 1, sizeof(struct Bill), fp);
     fclose(fp);
 }
 
