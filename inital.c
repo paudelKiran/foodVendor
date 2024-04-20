@@ -453,7 +453,7 @@ void displayFoodItems(char *restroEmail)
     {
         if (strcmp(item.restaurantEmail, restroEmail) == 0)
         {
-            printf("%d.%s --> %.2f\n", count, item.name, item.price);
+            printf("%d.%s --> %2f\n", count, item.name, item.price);
             count++;
         }
     }
@@ -475,15 +475,22 @@ void removeFoodItem()
     if (fp == NULL && tmp == NULL)
     {
         printf("Error opening file");
-        return;
+        exit(1);
     }
     while (fread(&item, sizeof(item), 1, fp))
     {
-        if (!(strcmp(item.restaurantEmail, restroEmail) == 0 && count == rmv))
+        if (!(strcmp(item.restaurantEmail, restroEmail) == 0))
         {
             fwrite(&item, 1, sizeof(item), tmp);
         }
-        count++;
+        else
+        {
+            if (!(count == rmv))
+            {
+                fwrite(&item, 1, sizeof(item), tmp);
+            }
+            count++;
+        }
     }
 
     fclose(fp);
@@ -500,14 +507,14 @@ void viewTransactions(char *transactor)
     FILE *fp = fopen("bill.txt", "rb");
 
     struct Bill txn;
-    while (fread(&txn, sizeof(txn), 1, fp))
+    printf("S.N\t\tItems\t\tQuantity\tTotal Amount\n");
+    while (fread(&txn, sizeof(struct Bill), 1, fp))
     {
-        printf("S.N\t\tItems\t\tQuantity\tTotal Amount\n");
         if (strcmp(transactor, txn.foodItem.restaurantEmail) == 0 || strcmp(transactor, txn.customerEmail) == 0)
         {
-            printf("%d\t\t%s\t\t%d\t\t%.2f\n", count, txn.foodItem.name, txn.quantity, txn.total);
+            printf("%d\t\t%s\t\t%d\t\t%f\n", count, txn.foodItem.name, txn.quantity, txn.total);
+            count++;
         }
-        count++;
     }
 
     fclose(fp);
@@ -587,13 +594,13 @@ void searchByHotel()
     displayFoodItems(restro.email);
     printf("0. Exit\n");
     printf("Which food do you want to have ?(input number) : ");
-    scanf("%d", &food);
+    scanf(" %d", &food);
     if (food == 0)
     {
         return;
     }
     printf("Quantity : ");
-    scanf("%d", &quantity);
+    scanf(" %d", &quantity);
 
     // finding the food that the user selected and generating bill
     FILE *fpt = fopen("menu.txt", "rb");
@@ -639,11 +646,11 @@ void searchByFood()
     struct FoodItem food;
     while (fread(&food, sizeof(struct FoodItem), 1, fp))
     {
-        printf("\t%d. %s --> %f \n", count, food.name, food.price);
+        printf("\t%d. %s --> %f\n", count, food.name, food.price);
         count++;
     }
+    printf("\t0. Exit\n");
     printf("Which food do you want to have ?(input number) : ");
-    printf("0. Exit\n");
     scanf("%d", &ch);
     if (ch == 0)
     {
@@ -685,6 +692,7 @@ void generateBill(struct FoodItem *orderedItem, int quantity)
     struct Bill bill;
     strcpy(bill.customerEmail, customerEmail);
     strcpy(bill.foodItem.name, orderedItem->name);
+    strcpy(bill.foodItem.restaurantEmail, orderedItem->restaurantEmail);
     bill.foodItem.price = orderedItem->price;
     bill.quantity = quantity;
     bill.total = quantity * (orderedItem->price);
@@ -699,5 +707,5 @@ void exit_program()
     printf("\tKIRAN PAUDEL\t(080BCT019)\n");
     printf("\tALIN TIMELSANA\t(080BCT003)\n");
     printf("\tABHISHEK BHATTARAI\t(080BCT001)\n");
-    exit(0);
+    return;
 }
