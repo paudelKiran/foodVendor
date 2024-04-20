@@ -41,6 +41,7 @@ int customerLogin();
 int restaurantOwnerLogin();
 int verifyEmail(char *email);
 int verifyPassword(char *password);
+int verifyNumber(char *number);
 void restaurantOwnerPanel();
 void addFoodItem();
 void removeFoodItem();
@@ -100,13 +101,14 @@ int main()
 int verifyEmail(char *email)
 {
     // Check if email contains @ and .
+    int progress = 0;
     char *atSign = strchr(email, '@');
     char *dot = strchr(email, '.');
     if (atSign != NULL && dot != NULL)
     {
         if (atSign < dot)
         {
-            return 1;
+            progress = 1;
         }
         else
         {
@@ -117,10 +119,9 @@ int verifyEmail(char *email)
     else
     {
         printf("Not a valid email.");
+        return 0;
     }
-    return 0;
 }
-
 // Verify password
 int verifyPassword(char *password)
 {
@@ -129,7 +130,23 @@ int verifyPassword(char *password)
     {
         return 1;
     }
-    return 0;
+    else
+    {
+        printf("Password should be at least 8 characters long.\n");
+        return 0;
+    }
+}
+
+int verifyNumber(char *number)
+{
+    if (strlen(number) == 10)
+    {
+        return 1;
+    }
+    else
+    {
+        printf("Please enter number of 10 digits.");
+    }
 }
 
 // Customer signup
@@ -167,15 +184,15 @@ void customerSignup()
     scanf(" %s", customer.password);
 
     // Validate email and password
-    verifyEmail(customer.email);
-    verifyPassword(customer.password);
+    if (verifyEmail(customer.email) && verifyPassword(customer.password) && verifyNumber(customer.phone))
+    {
+        // Save customer details to file
+        fp = fopen("customers.txt", "a");
+        fwrite(&customer, sizeof(struct Customer), 1, fp);
+        fclose(fp);
 
-    // Save customer details to file
-    fp = fopen("customers.txt", "a");
-    fwrite(&customer, sizeof(struct Customer), 1, fp);
-    fclose(fp);
-
-    printf("Customer account created successfully!\n");
+        printf("Customer account created successfully!\n");
+    }
 }
 
 // Restaurant owner signup
@@ -219,21 +236,21 @@ void restaurantOwnerSignup()
     printf("Enter location: ");
     scanf(" %s", owner.location);
 
-    verifyEmail(owner.email);
-    verifyPassword(owner.password);
-
-    // Save restaurant owner details to file
-    FILE *fp2;
-    fp2 = fopen("restaurant_owners.txt", "a");
-    if (fp2 == NULL)
+    if (verifyEmail(owner.email) && verifyPassword(owner.password) && verifyNumber(owner.phone))
     {
-        printf("Error opening file");
-        return;
-    }
-    fwrite(&owner, sizeof(struct RestaurantOwner), 1, fp2);
-    fclose(fp2);
+        // Save restaurant owner details to file
+        FILE *fp2;
+        fp2 = fopen("restaurant_owners.txt", "a");
+        if (fp2 == NULL)
+        {
+            printf("Error opening file");
+            return;
+        }
+        fwrite(&owner, sizeof(struct RestaurantOwner), 1, fp2);
+        fclose(fp2);
 
-    printf("Restaurant owner account created successfully!\n");
+        printf("Restaurant owner account created successfully!\n");
+    }
 }
 
 // Restaurant owner login
@@ -270,7 +287,7 @@ int restaurantOwnerLogin()
     if (fp == NULL)
     {
         printf("Error opening file");
-        return;
+        exit(1);
     }
 
     while (fread(&owner, sizeof(struct RestaurantOwner), 1, fp))
@@ -326,7 +343,7 @@ int customerLogin()
     if (fp == NULL)
     {
         printf("Error opening file");
-        return;
+        exit(1);
     }
     while (fread(&customer, sizeof(struct Customer), 1, fp))
     {
