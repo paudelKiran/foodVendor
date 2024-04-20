@@ -375,8 +375,7 @@ void restaurantOwnerPanel()
 
     while (1)
     {
-        printf("\n\t****************** RESTAURANT OWNER PANEL ****************** \n");
-        printf("\n");
+        printf("\n\t****************** RESTAURANT OWNER PANEL ****************** \n\n");
         printf("1. Add Food Item\n");
         printf("2. Remove Food Item\n");
         printf("3. View Food Items\n");
@@ -520,8 +519,7 @@ void customerPanel()
 
     while (1)
     {
-        printf("\n\t****************** CUSTOMER PANEL ****************** \n");
-        printf("\nCustomer Panel\n");
+        printf("\n\t****************** CUSTOMER PANEL ****************** \n\n");
         printf("1. View Food Items\n");
         printf("2. View Food Items By Hotel\n");
         printf("3. View Order History\n");
@@ -584,9 +582,15 @@ void searchByHotel()
     fclose(fp);
 
     // display food listed in menu of searched hotel
-    displayFoodItems(restro.name);
+    strcpy(restroEmail, restro.email);
+    displayFoodItems(restro.email);
+    printf("0. Exit\n");
     printf("Which food do you want to have ?(input number) : ");
     scanf("%d", &food);
+    if (food == 0)
+    {
+        return;
+    }
     printf("Quantity : ");
     scanf("%d", &quantity);
 
@@ -606,8 +610,8 @@ void searchByHotel()
         {
             if (loop == food)
             {
-                fclose(fpt);
                 generateBill(&item, quantity);
+                fclose(fpt);
                 break;
             }
             loop++;
@@ -638,7 +642,12 @@ void searchByFood()
         count++;
     }
     printf("Which food do you want to have ?(input number) : ");
+    printf("0. Exit\n");
     scanf("%d", &ch);
+    if (ch == 0)
+    {
+        return;
+    }
     printf("Quantity : ");
     scanf("%d", &quantity);
     // checking the food
@@ -662,7 +671,7 @@ void generateBill(struct FoodItem *orderedItem, int quantity)
     printf("Item: %s\n", orderedItem->name);
     printf("Price: %.2f\n", orderedItem->price);
     printf("Total: %.2f\n", (orderedItem->price) * quantity);
-    printf("\tThank You for Ordering!! \n");
+    printf("\tThank You for Ordering!! Your order will be delivered soon.. \n");
 
     // Open bill file and write bill
     FILE *fp = fopen("bill.txt", "a");
